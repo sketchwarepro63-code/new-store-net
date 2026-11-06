@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boutique numérique</title>
+<style>
+:root{--bg:#f2f6f5;--ink:#10232b;--acc:#0f766e;--line:#cdd9d6;--err:#b42318;--or:#f5b83d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif;padding-bottom:76px}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:10px 16px}
+header h1{font-size:18px;margin:0}
+main{max-width:640px;margin:0 auto;padding:16px}
+h2{margin:.2em 0;font-size:18px}
+input,select,textarea{width:100%;padding:11px;margin:5px 0;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff}
+textarea{min-height:80px}
+button{padding:11px 16px;margin:5px 6px 5px 0;border:0;border-radius:6px;background:var(--acc);color:#fff;font:inherit;cursor:pointer}
+button.alt{background:#fff;color:var(--acc);border:1px solid var(--acc)}
+button.lien{background:none;color:var(--acc);padding:6px 0;text-decoration:underline}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+.item{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px;margin:10px 0}
+.item img{max-width:100%;border-radius:6px}
+.err{color:var(--err)}.ok{color:var(--acc)}
+#msg{min-height:22px}
+.hide{display:none !important}
+.badge{background:var(--err);color:#fff;border-radius:10px;padding:1px 7px;font-size:12px;margin-left:4px}
+nav#barre{position:fixed;left:0;right:0;bottom:0;z-index:10;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:4px 0}
+nav#barre button{flex:1;margin:0;background:none;color:#5b6b70;border-top:3px solid transparent;border-radius:0;font-weight:600;padding:9px 4px}
+nav#barre button.actif{color:var(--ink);border-top-color:var(--or)}
+.etoiles{color:var(--or);letter-spacing:2px}
+.note{color:#5b6b70;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Boutique numérique</h1>
+  <button id="cloche" class="alt hide" aria-label="Notifications">🔔 <span id="nb-notif" class="badge hide">0</span></button>
+</header>
+<main>
+  <p id="msg" role="status"></p>
+
+  <!-- CONNEXION -->
+  <section id="v-auth" class="hide">
+    <div id="a-login" class="item">
+      <h2>Connexion</h2>
+      <input id="l-mail" type="email" placeholder="E-mail" autocomplete="email">
+      <input id="l-pw" type="password" placeholder="Mot de passe" autocomplete="current-password">
+      <button id="l-btn">Se connecter</button>
+      <div><button class="lien" id="l-vers-reset">Mot de passe oublié</button></div>
+      <div><button class="lien" id="l-vers-reg">Pas encore de compte ? Créer un compte</button></div>
+    </div>
+
+    <!-- INSCRIPTION (écran séparé) -->
+    <div id="a-reg" class="item hide">
+      <h2>Créer un compte</h2>
+      <input id="r-nom" placeholder="Nom complet" autocomplete="name">
+      <input id="r-tel" type="tel" placeholder="Téléphone" autocomplete="tel">
+      <input id="r-mail" type="email" placeholder="E-mail" autocomplete="email">
+      <input id="r-pw" type="password" placeholder="Mot de passe (6 caractères minimum)" autocomplete="new-password">
+      <input id="r-pw2" type="password" placeholder="Répète le mot de passe" autocomplete="new-password">
+      <button id="r-btn">Créer mon compte</button>
+      <div><button class="lien" id="r-vers-login">J'ai déjà un compte</button></div>
+    </div>
+
+    <!-- RÉINITIALISATION -->
+    <div id="a-reset" class="item hide">
+      <h2>Mot de passe oublié</h2>
+      <input id="f-mail" type="email" placeholder="E-mail de ton compte">
+      <button id="f-btn">Envoyer le lien de réinitialisation</button>
+      <div><button class="lien" id="f-vers-login">Retour à la connexion</button></div>
+    </div>
+  </section>
+
+  <!-- APPLICATION -->
+  <section id="v-app" class="hide">
+
+    <!-- Produits -->
+    <div id="p-prod"><div id="liste"></div></div>
+
+    <!-- Détail produit : achat, commentaires, témoignages -->
+    <div id="p-detail" class="hide"></div>
+
+    <!-- Mes achats -->
+    <div id="p-ach" class="hide"></div>
+
+    <!-- Paramètres -->
+    <div id="p-param" class="hide">
+      <div class="item">
+        <h2>Mon compte</h2>
+        <p class="note" id="p-infos"></p>
+        <input id="p-nom" placeholder="Nom complet">
+        <button id="p-save-nom">Enregistrer mon nom</button>
+      </div>
+      <div class="item">
+        <h2>Changer mon mot de passe</h2>
+        <input id="p-pw" type="password" placeholder="Nouveau mot de passe (6 caractères minimum)" autocomplete="new-password">
+        <button id="p-save-pw">Modifier le mot de passe</button>
+        <p class="note">Si la modification est refusée, déconnecte-toi, reconnecte-toi, puis réessaie.</p>
+      </div>
+      <div class="item">
+        <h2>Réinitialiser par e-mail</h2>
+        <p class="note">Un lien est envoyé à ton adresse pour choisir un nouveau mot de passe.</p>
+        <button class="alt" id="p-reset">Envoyer le lien</button>
+      </div>
+      <div class="item">
+        <button class="alt" id="p-out">Se déconnecter</button>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="p-notif" class="hide"></div>
+  </section>
+</main>
+
+<nav id="barre" class="hide">
+  <button data-v="prod" class="actif">Produits</button>
+  <button data-v="ach">Mes achats</button>
+  <button data-v="param">Paramètres</button>
+</nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getDatabase, ref, onValue, push, set, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+const cfg = {
+  apiKey: "AIzaSyDJeXc8kiR0UiZXFaIOW6vDD-6IERw0P0Q",
+  authDomain: "new-store-net.firebaseapp.com",
+  projectId: "new-store-net",
+  appId: "1:458726038293:web:7f24e98de2c4796d92271c",
+  databaseURL: "https://new-store-net-default-rtdb.firebaseio.com"
+};
+// Application web Apps Script (se termine par /exec)
+const APPS = "https://script.google.com/macros/s/AKfycby2eQITEuGP_cpt6YMP_XuZNza1ypmqSNKukiBkOKAHzdFPthMzEspZ5xaz9k34cnM/exec";
+
+const auth = getAuth(initializeApp(cfg)), db = getDatabase(auth.app);
+const $ = i => document.getElementById(i);
+const el = (t, p = {}, ...k) => { const e = Object.assign(document.createElement(t), p); e.append(...k); return e; };
+const fmt = n => Number(n || 0).toLocaleString("fr-FR") + " FC";
+const sur = u => /^https:\/\//.test(u || "");
+const MAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const dateFr = t => t ? new Date(t).toLocaleDateString("fr-FR") : "";
+const say = (t, ok) => { $("msg").textContent = t; $("msg").className = ok ? "ok" : "err"; };
+const ERR = {
+  "auth/invalid-credential": "E-mail ou mot de passe incorrect.",
+  "auth/email-already-in-use": "Cette adresse e-mail est déjà utilisée.",
+  "auth/weak-password": "Mot de passe trop faible (6 caractères minimum).",
+  "auth/invalid-email": "Adresse e-mail invalide.",
+  "auth/requires-recent-login": "Pour des raisons de sécurité, déconnecte-toi puis reconnecte-toi, et réessaie.",
+  "auth/network-request-failed": "Pas de connexion internet."
+};
+const erreur = e => ERR[e.code] || e.message;
+
+let produits = {}, moi = {}, commandes = {}, notifsPerso = {}, notifsPublic = {};
+let stops = [], stopsProduit = [], inscription = null;
+let lus = new Set(JSON.parse(localStorage.getItem("notifs-lues") || "[]"));
+
+async function api(action, d = {}) {
+  const idToken = await auth.currentUser.getIdToken();
+  const r = await fetch(APPS, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action, idToken, ...d }) });
+  const j = await r.json();
+  if (j.erreur) throw new Error(j.erreur);
+  return j;
+}
+
+/* ---------- Navigation ---------- */
+function voir(id) {
+  ["p-prod", "p-detail", "p-ach", "p-param", "p-notif"].forEach(x => $(x).classList.toggle("hide", x !== id));
+  const onglet = { "p-prod": "prod", "p-detail": "prod", "p-ach": "ach", "p-param": "param", "p-notif": "" }[id];
+  document.querySelectorAll("nav#barre [data-v]").forEach(b => b.classList.toggle("actif", b.dataset.v === onglet));
+  say("");
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll("nav#barre [data-v]").forEach(b => b.onclick = () => voir(b.dataset.v === "prod" ? "p-prod" : b.dataset.v === "ach" ? "p-ach" : "p-param"));
+$("cloche").onclick = () => { voir("p-notif"); afficherNotifs(); marquerLues(); };
+
+function auth_vue(v) {
+  ["a-login", "a-reg", "a-reset"].forEach(x => $(x).classList.toggle("hide", x !== v));
+  say("");
+}
+$("l-vers-reg").onclick = () => auth_vue("a-reg");
+$("r-vers-login").onclick = () => auth_vue("a-login");
+$("l-vers-reset").onclick = () => auth_vue("a-reset");
+$("f-vers-login").onclick = () => auth_vue("a-login");
+
+/* ---------- Connexion, inscription, mot de passe ---------- */
+$("l-btn").onclick = async () => {
+  try { await signInWithEmailAndPassword(auth, $("l-mail").value.trim(), $("l-pw").value); }
+  catch (e) { say(erreur(e)); }
+};
+$("r-btn").onclick = async () => {
+  const nom = $("r-nom").value.trim(), tel = $("r-tel").value.replace(/\D/g, ""), mail = $("r-mail").value.trim(), pw = $("r-pw").value;
+  if (!nom) return say("Entre ton nom complet.");
+  if (tel.length < 8) return say("Numéro de téléphone invalide.");
+  if (!MAIL.test(mail)) return say("Adresse e-mail invalide.");
+  if (pw.length < 6) return say("Mot de passe : 6 caractères minimum.");
+  if (pw !== $("r-pw2").value) return say("Les deux mots de passe ne sont pas identiques.");
+  inscription = { nom, telephone: tel };
+  try { await createUserWithEmailAndPassword(auth, mail, pw); }
+  catch (e) { inscription = null; say(erreur(e)); }
+};
+$("f-btn").onclick = async () => {
+  const mail = $("f-mail").value.trim();
+  if (!MAIL.test(mail)) return say("Adresse e-mail invalide.");
+  try { await sendPasswordResetEmail(auth, mail); say("Si un compte existe, un lien vient d'être envoyé à cette adresse.", true); }
+  catch (e) { say(erreur(e)); }
+};
+$("p-reset").onclick = async () => {
+  try { await sendPasswordResetEmail(auth, auth.currentUser.email); say("Lien envoyé à " + auth.currentUser.email + ".", true); }
+  catch (e) { say(erreur(e)); }
+};
+$("p-save-pw").onclick = async () => {
+  const pw = $("p-pw").value;
+  if (pw.length < 6) return say("Mot de passe : 6 caractères minimum.");
+  try { await updatePassword(auth.currentUser, pw); $("p-pw").value = ""; say("Mot de passe modifié.", true); }
+  catch (e) { say(erreur(e)); }
+};
+$("p-save-nom").onclick = async () => {
+  const nom = $("p-nom").value.trim();
+  if (!nom) return say("Entre ton nom.");
+  try { await set(ref(db, "users/" + auth.currentUser.uid + "/nom"), nom); say("Nom enregistré.", true); }
+  catch (e) { say("Erreur : " + e.message); }
+};
+$("p-out").onclick = () => signOut(auth);
+
+/* ---------- Session ---------- */
+onAuthStateChanged(auth, async u => {
+  stops.forEach(f => f()); stops = [];
+  $("v-auth").classList.toggle("hide", !!u);
+  $("v-app").classList.toggle("hide", !u);
+  $("barre").classList.toggle("hide", !u);
+  $("cloche").classList.toggle("hide", !u);
+  if (!u) { auth_vue("a-login"); return; }
+  voir("p-prod");
+  try { await api("profil", inscription || {}); inscription = null; }
+  catch (e) { say(e.message); return signOut(auth); }
+  stops.push(onValue(ref(db, "users/" + u.uid), s => {
+    moi = s.val() || {};
+    $("p-infos").textContent = (moi.nom || "") + " · " + (u.email || "");
+    if (!$("p-nom").value) $("p-nom").value = moi.nom || "";
+  }));
+  stops.push(onValue(query(ref(db, "orders"), orderByChild("uid"), equalTo(u.uid)), s => { commandes = s.val() || {}; afficherAchats(); majBadge(); }));
+  stops.push(onValue(ref(db, "notifications/" + u.uid), s => { notifsPerso = s.val() || {}; afficherNotifs(); majBadge(); }));
+  stops.push(onValue(ref(db, "notifications/public"), s => { notifsPublic = s.val() || {}; afficherNotifs(); majBadge(); }));
+});
+onValue(ref(db, "products"), s => { produits = s.val() || {}; afficherCatalogue(); });
+
+/* ---------- Catalogue ---------- */
+function afficherCatalogue() {
+  const box = $("liste"); box.replaceChildren();
+  const ids = Object.keys(produits).filter(id => produits[id].publie !== false);
+  if (!ids.length) return box.append(el("p", {}, "Aucun produit pour le moment."));
+  ids.forEach(id => {
+    const p = produits[id];
+    box.append(el("div", { className: "item" },
+      ...(sur(p.image) ? [el("img", { src: p.image, alt: "" })] : []),
+      el("h2", {}, p.titre), el("p", {}, p.description || ""),
+      el("p", {}, el("b", {}, fmt(p.prix)), "  ·  ", el("span", { className: "note" }, (p.ventes || 0) + " achat(s)")),
+      el("button", { textContent: "Voir le produit", onclick: () => ouvrir(id) })));
+  });
+}
+
+/* ---------- Détail : achat, code promo, commentaires, témoignages ---------- */
+function ouvrir(id) {
+  const p = produits[id], d = $("p-detail");
+  const code = el("input", { placeholder: "Code promo (facultatif)" }), m = el("p"), pay = el("div");
+  const dire = (t, ok) => { m.textContent = t; m.className = ok ? "ok" : "err"; };
+  const zoneComm = el("div");
+  d.replaceChildren(el("div", { className: "item" },
+    el("button", { className: "alt", textContent: "Retour", onclick: () => { stopsProduit.forEach(f => f()); stopsProduit = []; voir("p-prod"); } }),
+    ...(sur(p.image) ? [el("img", { src: p.image, alt: "" })] : []),
+    el("h2", {}, p.titre), el("p", {}, p.description || ""),
+    el("p", {}, el("b", {}, fmt(p.prix)), "  ·  ", el("span", { className: "note" }, (p.ventes || 0) + " achat(s)"), "  ·  ", el("span", { id: "moy-" + id, className: "note" }, "Pas encore d'avis")),
+    code,
+    el("button", { className: "alt", textContent: "Appliquer le code", onclick: async () => {
+      try { const r = await api("verifier_promo", { productId: id, code: code.value }); dire("Prix avec ce code : " + fmt(r.prixFinal), true); } catch (e) { dire(e.message); }
+    } }),
+    el("button", { textContent: "Acheter", onclick: async () => {
+      try {
+        const r = await api("creer_commande", { productId: id, code: code.value }); pay.replaceChildren();
+        if (r.statut === "livree") return dire("Commande gratuite : ton fichier est dans « Mes achats ».", true);
+        const pid = el("input", { placeholder: "ID de paiement du reçu" });
+        pay.append(el("p", {}, "1. Paie " + fmt(r.prix) + " : ", sur(r.lienPaiement) ? el("a", { href: r.lienPaiement, target: "_blank", rel: "noopener", textContent: "ouvrir la page de paiement" }) : "lien indisponible"),
+          el("p", {}, "2. Colle l'ID de ton reçu :"), pid,
+          el("button", { textContent: "Envoyer la preuve", onclick: async () => {
+            try { await api("preuve", { oid: r.oid, paymentId: pid.value }); dire("Preuve envoyée : ta commande sera validée après vérification.", true); } catch (e) { dire(e.message); }
+          } }));
+        dire("Commande créée.", true);
+      } catch (e) { dire(e.message); }
+    } }), m, pay,
+    el("h2", {}, "Avis et témoignages"), zoneComm));
+
+  // Commentaires : lecture en direct
+  stopsProduit.forEach(f => f()); stopsProduit = [];
+  stopsProduit.push(onValue(ref(db, "comments/" + id), s => {
+    const liste = Object.values(s.val() || {}).sort((a, b) => (b.date || 0) - (a.date || 0));
+    const notes = liste.map(c => Number(c.note)).filter(n => n >= 1 && n <= 5);
+    const moy = notes.length ? (notes.reduce((x, y) => x + y, 0) / notes.length).toFixed(1) : null;
+    const lab = $("moy-" + id);
+    if (lab) lab.textContent = moy ? "★ " + moy + " / 5 (" + notes.length + " avis)" : "Pas encore d'avis";
+    zoneComm.replaceChildren(...formulaireComm(id), ...(liste.length ? liste.map(c => el("div", { className: "item" },
+      el("b", {}, c.nom || "Client"), "  ", el("span", { className: "note" }, dateFr(c.date)),
+      c.note ? el("div", { className: "etoiles" }, "★".repeat(Number(c.note)) + "☆".repeat(5 - Number(c.note))) : "",
+      el("p", {}, c.texte || ""))) : [el("p", { className: "note" }, "Aucun commentaire pour le moment.")]));
+  }));
+  voir("p-detail");
+}
+
+function formulaireComm(pid) {
+  const texte = el("textarea", { placeholder: "Ton avis sur ce produit (500 caractères maximum)" });
+  const note = el("select", {}, el("option", { value: "", textContent: "Note (facultatif)" }), ...[5, 4, 3, 2, 1].map(n => el("option", { value: String(n), textContent: n + " étoile(s)" })));
+  const msg = el("p");
+  const bouton = el("button", { textContent: "Publier mon avis", onclick: async () => {
+    const t = texte.value.trim();
+    if (!t) { msg.textContent = "Écris ton avis."; msg.className = "err"; return; }
+    if (t.length > 500) { msg.textContent = "Avis trop long (500 caractères maximum)."; msg.className = "err"; return; }
+    try {
+      await push(ref(db, "comments/" + pid), { uid: auth.currentUser.uid, nom: ((moi.prenom || "") + " " + (moi.nom || "")).trim() || moi.nom || "Client", texte: t, note: note.value ? Number(note.value) : null, date: { ".sv": "timestamp" } });
+      texte.value = ""; note.value = ""; msg.textContent = "Avis publié."; msg.className = "ok";
+    } catch (e) { msg.textContent = "Erreur : " + e.message; msg.className = "err"; }
+  } });
+  return [el("h2", { style: "font-size:16px" }, "Laisser un avis"), texte, note, bouton, msg];
+}
+
+/* ---------- Mes achats ---------- */
+const STATUT = { attente_paiement: "En attente de paiement", verification: "En vérification", livree: "Livrée", rejetee: "Rejetée" };
+function afficherAchats() {
+  const box = $("p-ach"); box.replaceChildren(el("h2", {}, "Mes achats"));
+  const l = Object.values(commandes).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  if (!l.length) return box.append(el("p", {}, "Aucun achat pour le moment."));
+  l.forEach(c => box.append(el("div", { className: "item" }, el("h2", {}, c.titre), el("p", {}, fmt(c.prix) + " : " + (STATUT[c.statut] || c.statut)),
+    ...(c.statut === "livree" && c.licenceCode ? [el("p", {}, "Clé : ", el("b", {}, c.licenceCode))] : []),
+    ...(c.statut === "livree" && sur(c.fichier) ? [el("a", { href: c.fichier, target: "_blank", rel: "noopener", textContent: "Télécharger le fichier" })] : []))));
+}
+
+/* ---------- Notifications : publiques et personnelles ---------- */
+function toutesNotifs() {
+  const p = Object.keys(notifsPublic).map(k => ({ id: "pub-" + k, ...notifsPublic[k], type: "publique" }));
+  const s = Object.keys(notifsPerso).map(k => ({ id: "per-" + k, ...notifsPerso[k], type: "personnelle" }));
+  return [...p, ...s].sort((a, b) => (b.date || 0) - (a.date || 0));
+}
+function afficherNotifs() {
+  const box = $("p-notif"); box.replaceChildren(el("h2", {}, "Notifications"));
+  const l = toutesNotifs();
+  if (!l.length) return box.append(el("p", {}, "Aucune notification."));
+  l.forEach(n => box.append(el("div", { className: "item" },
+    el("span", { className: "note" }, n.type === "publique" ? "Annonce" : "Pour toi", " · ", dateFr(n.date)),
+    el("h2", {}, n.titre || ""), el("p", {}, n.texte || ""))));
+}
+function nonLues() { return toutesNotifs().filter(n => !lus.has(n.id)).length; }
+function majBadge() {
+  const n = nonLues();
+  $("nb-notif").textContent = n;
+  $("nb-notif").classList.toggle("hide", n === 0);
+}
+function marquerLues() {
+  toutesNotifs().forEach(n => lus.add(n.id));
+  localStorage.setItem("notifs-lues", JSON.stringify([...lus]));
+  majBadge();
+}
+</script>
+</body>
+        </html>
